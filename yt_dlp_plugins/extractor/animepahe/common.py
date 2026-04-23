@@ -1,7 +1,6 @@
 import itertools
 import re
 from collections.abc import Iterator
-from typing import Any
 
 from yt_dlp.extractor.common import InfoExtractor
 from yt_dlp.utils import (
@@ -24,7 +23,7 @@ class AnimepaheBaseIE(InfoExtractor):
                     data-audio="(?P<lang>\w+)"
                     """)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._base_url = None
 
@@ -60,7 +59,7 @@ class AnimepaheBaseIE(InfoExtractor):
             self._base_url = api_url
             return self._base_url
 
-    def _yield_formats(self, content: str) -> Iterator[dict[str, Any]]:
+    def _yield_formats(self, content: str) -> Iterator[dict[str, str | int | dict[str, str]]]:
         for data in self._DATA_RE.finditer(content):
             lang = data.group('lang')
             height = data.group('height')
@@ -79,14 +78,16 @@ class AnimepaheBaseIE(InfoExtractor):
         pattern = r'const\s*source\s*=\\\'(?P<url>[^\\]+)\\'
         return self._search_regex(pattern, decoded_page, name='m3u8 url', group='url')
 
-    def _yield_entries(self, playlist_url: str, playlist_id: str, playlist_title: str) -> Iterator[dict[str, Any]]:
+    def _yield_entries(
+        self, playlist_url: str, playlist_id: str, playlist_title: str, ie: str | object
+    ) -> Iterator[dict[str, str | int | float]]:
         base_url = playlist_url.replace('/anime/', '/play/')
         for anime in self._fetch_page_entries(playlist_url, playlist_id):
             episode_num = str_to_int(anime.get('episode'))
             yield self.url_result(
                 url_transparent=True,
                 url=f'{base_url}/{anime.get("session")}',
-                ie='Animepahe',
+                ie=ie,
                 video_id=anime.get('id'),
                 video_title=f'{playlist_title} Episode {episode_num}',
                 episode_number=episode_num,
@@ -96,7 +97,7 @@ class AnimepaheBaseIE(InfoExtractor):
                 series=playlist_title,
             )
 
-    def _fetch_page_entries(self, url: str, playlist_id: str) -> Iterator[dict[str, Any]]:
+    def _fetch_page_entries(self, url: str, playlist_id: str) -> Iterator[dict[str, str | int]]:
         api_url = f'https://{get_domain(url)}/api'
         for page_num in itertools.count(1):
             json_data = self._download_json(
@@ -113,7 +114,7 @@ class AnimepaheBaseIE(InfoExtractor):
                 break
 
     @staticmethod
-    def _yield_json(j: dict) -> Iterator[dict[str, Any]]:
+    def _yield_json(j: dict) -> Iterator[dict[str, str | int]]:
         if not isinstance(j, dict) or not j:
             raise ExtractorError('Invalid JSON response: expected dict', expected=True)
 

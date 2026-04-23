@@ -1,4 +1,4 @@
-__version__ = '2026.04.23'
+__version__ = '2026.4.23.1'
 
 from collections.abc import Iterator
 from typing import Any
@@ -51,7 +51,6 @@ class AnimepaheIE(PaheIE):
     def _real_extract(self, url: str) -> dict[str, Any]:
         playlist_id, video_id = self._match_valid_url(url).groups()
         episode_page = self._download_webpage(url, video_id[:5])
-
         content = get_element_by_id('resolutionMenu', episode_page)
         if content is None:
             raise ExtractorError('No results found; maybe a wrong ID?', expected=True)
@@ -104,13 +103,13 @@ class AnimepahePlaylistIE(PaheIE):
         },
     ]
 
-    def _real_extract(self, url) -> dict[str, Any]:
+    def _real_extract(self, url: str) -> dict[str, Any]:
         playlist_id = self._match_id(url)
         playlist_page = self._download_webpage(url, playlist_id[:5])
         playlist_title = self.title(self._og_search_title(playlist_page))
 
         return self.playlist_result(
-            entries=self._yield_entries(url, playlist_id, playlist_title),
+            entries=self._yield_entries(url, playlist_id, playlist_title, AnimepaheIE),
             playlist_id=playlist_id,
             playlist_title=playlist_title,
             playlist_description=self._og_search_description(playlist_page),
@@ -123,10 +122,10 @@ class AnimepaheSearchIE(SearchInfoExtractor, PaheIE):
     _TESTS = [
         {
             'url': 'animepahe:higehiro',
+            'playlist_count': 1,
             'info_dict': {
                 'id': 'higehiro',
                 'title': 'higehiro',
-                'playlist_count': 1,
             },
             'params': {'skip_download': True},
         },
@@ -150,7 +149,7 @@ class AnimepaheSearchIE(SearchInfoExtractor, PaheIE):
         },
     ]
 
-    def _search_results(self, query) -> Iterator[dict[str, Any]]:
+    def _search_results(self, query: str) -> Iterator[dict[str, Any]]:
         base_url = self._get_base_url()
         json_data = self._download_json(f'{base_url}/api', query, query={'m': 'search', 'q': query})
         if json_data.get('from') is None:
