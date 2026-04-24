@@ -14,7 +14,7 @@ requires-python = ">=3.10"
 license = "GPL-3.0-or-later"
 keywords = []
 authors = [
-  { name = "asepsukasusunirvatia", email = "210173402+asepsukasusunirvatia@users.noreply.github.com" },
+  { name = "Asep5K", email = "asep5k@noreply.codeberg.org" },
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -33,9 +33,9 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/asepsukasusunirvatia/yt-dlp-animepahe#readme"
-Issues = "https://github.com/asepsukasusunirvatia/yt-dlp-animepahe/issues"
-Source = "https://github.com/asepsukasusunirvatia/yt-dlp-animepahe"
+Documentation = "https://codeberg.org/Asep5K/yt-dlp-animepahe/src/branch/main/README.md"
+Issues = "https://codeberg.org/Asep5K/yt-dlp-animepahe/issues"
+Source = "https://codeberg.org/Asep5K/yt-dlp-animepahe"
 
 [project.optional-dependencies]
 static-analysis = [

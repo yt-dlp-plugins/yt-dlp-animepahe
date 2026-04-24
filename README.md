@@ -2,7 +2,11 @@ This is a [yt-dlp](https://github.com/yt-dlp/yt-dlp "yt-dlp repooository") extra
 
 ## Installation
     
-    python -m pip install -U https://github.com/asepsukasusunirvatia/yt-dlp-animepahe/archive/main.zip
+    python -m pip install -U https://codeberg.org/Asep5K/yt-dlp-animepahe/archive/main.zip
+
+## AUR
+
+    yay -S yt-dlp-animepahe
 
 ## Usage
 
