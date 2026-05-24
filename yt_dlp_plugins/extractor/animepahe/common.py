@@ -69,7 +69,7 @@ class AnimepaheBaseIE(InfoExtractor):
         fatal = not self.get_param('ignore_no_formats_error')
         if (
             encoded_page := self._download_webpage(
-                url, self._generic_id(url), note='Downloading encoded page', fatal=fatal
+                url, self._generic_id(url), headers={'Referer': 'https://animepahe.pw/'}, note='Downloading encoded page', fatal=fatal
             )
         ) is False:
             return None
