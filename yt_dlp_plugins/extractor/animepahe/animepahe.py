@@ -1,4 +1,4 @@
-__version__ = '2026.5.15'
+__version__ = '2026.5.25'
 
 from collections.abc import Iterator
 from typing import Any
