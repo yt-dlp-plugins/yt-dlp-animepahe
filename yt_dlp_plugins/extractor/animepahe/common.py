@@ -69,7 +69,11 @@ class AnimepaheBaseIE(InfoExtractor):
         fatal = not self.get_param('ignore_no_formats_error')
         if (
             encoded_page := self._download_webpage(
-                url, self._generic_id(url), note='Downloading encoded page', fatal=fatal
+                url,
+                self._generic_id(url),
+                note='Downloading encoded page',
+                fatal=fatal,
+                headers={'referer': 'https://animepahe.pw/'},
             )
         ) is False:
             return None
@@ -120,3 +124,6 @@ class AnimepaheBaseIE(InfoExtractor):
         # Ensure data is a list before yielding.
         if isinstance(data := j.get('data'), list):
             yield from data
+
+
+# vim: ft=python:nowrap
