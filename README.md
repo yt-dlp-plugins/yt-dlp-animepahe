@@ -2,7 +2,7 @@ This is a [yt-dlp](https://github.com/yt-dlp/yt-dlp "yt-dlp repooository") extra
 
 ## Installation
 ```bash
-python -m pip install -U https://github.com/asepsukasusunirvatia/yt-dlp-animepahe/archive/main.zip
+python -m pip install -U https://github.com/yt-dlp-plugins/yt-dlp-animepahe/archive/main.zip
 ```
 ## AUR
 ```bash
@@ -24,5 +24,7 @@ yt-dlp 'animepahe:title'
 
 <div align="left">
 
-[![PayPal](https://img.shields.io/badge/PayPal-Donate-blue?style=for-the-badge&logo=paypal "PayPal")](https://paypal.me/rezaoctavian496) [![Trakteer](https://img.shields.io/badge/Trakteer-asep5k-red?style=for-the-badge&logo=trakteer&logoColor=white "Trakteer")](https://trakteer.id/asep5k) [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg "Ko-fi")](https://ko-fi.com/aspe)
+[![Trakteer](https://img.shields.io/badge/Trakteer-F16061?style=for-the-badge&logo=buy-me-a-coffee&logoColor=white)](https://trakteer.id/asep5k) [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/rezaoctavian496) [![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/aspe) 
+
 </div>
+
