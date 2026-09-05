@@ -48,13 +48,16 @@ class AnimepaheIE(PaheIE):
 
     def _real_extract(self, url: str) -> dict[str, Any]:
         playlist_id, video_id = self._match_valid_url(url).groups()
-        episode_page = self._download_webpage(url, video_id[:5])
-        if (content := get_element_by_id('resolutionMenu', episode_page)) is None:
+        episode_page = self._download_webpage(
+            url,
+            video_id[:5],
+        )
+        if not (content := get_element_by_id('resolutionMenu', episode_page, tag='div')):
             raise ExtractorError('No results found; maybe a wrong ID?', expected=True)
-
+        self.write_debug(f'content: {content}')
         return {
             'id': video_id,
-            'title': (title := self.title(self._html_extract_title(episode_page))),
+            'title': (title := self.title(self._html_extract_title(episode_page) or video_id)),
             'episode_id': video_id,
             'playlist_id': playlist_id,
             'series': self.series(title),
@@ -105,7 +108,7 @@ class AnimepahePlaylistIE(PaheIE):
         playlist_page = self._download_webpage(url, playlist_id[:5])
         playlist_title = self.title(self._og_search_title(playlist_page))
         return self.playlist_result(
-            entries=self._yield_entries(url, playlist_id, playlist_title, AnimepaheIE),
+            entries=self._yield_entries(url, playlist_id, playlist_title),
             playlist_id=playlist_id,
             playlist_title=playlist_title,
             playlist_description=self._og_search_description(playlist_page),
@@ -146,7 +149,14 @@ class AnimepaheSearchIE(SearchInfoExtractor, PaheIE):
     ]
 
     def _search_results(self, query: str) -> Iterator[dict[str, Any]]:
-        result = self._download_json('https://animepahe.pw/api', query, query={'m': 'search', 'q': query})
+        result = self._download_json(
+            'https://animepahe.pw/api',
+            query,
+            query={'m': 'search', 'q': query},
+            headers=self._HEADERS,
+            impersonate=True,
+            require_impersonation=True,
+        )
         if result.get('from') is None:
             raise ExtractorError(f'unable to search {query}', expected=True)
 
@@ -157,3 +167,6 @@ class AnimepaheSearchIE(SearchInfoExtractor, PaheIE):
                 video_id=data_json.get('id'),
                 video_title=data_json.get('title'),
             )
+
+
+# vim:nowrap

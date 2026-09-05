@@ -1,4 +1,4 @@
-__version__ = '2026.6.2'
+__version__ = '2026.9.5'
 from .animepahe import (
     AnimepaheIE,
     AnimepahePlaylistIE,
