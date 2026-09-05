@@ -5,15 +5,20 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["yt_dlp_plugins"]
 
+[tool.hatch.build.targets.sdist]
+only-include = [
+  "/yt_dlp_plugins"
+]
+
 [project]
 name = "yt-dlp-animepahe"
 dynamic = ["version"]
 description = 'Animepahe extractor plugin for yt-dlp'
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "GPL-3.0-or-later"
 keywords = []
-authors = [{ name = "Asep5K", email = "asepdev.git@gmail.com" }]
+authors = [{ name = "Asep5K", email = "Asep5K@proton.me" }]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
@@ -26,7 +31,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
-dependencies = ["yt-dlp[default]>=2025.12.08"]
+dependencies = ["yt-dlp[default,curl-cffi]>=2025.12.08"]
 
 [project.urls]
 Documentation = "https://github.com/yt-dlp-plugins/yt-dlp-animepahe/blob/main/README.md"
@@ -40,20 +45,13 @@ static-analysis = ["ruff>=0.15.0"]
 path = "yt_dlp_plugins/extractor/animepahe/__init__.py"
 pattern = "__version__ = '(?P<version>[^']+)'"
 
-[tool.hatch.envs.hatch-static-analysis]
-detached = true
-features = ["static-analysis"]
-dependencies = []              # override hatch ruff version
-config-path = "pyproject.toml"
-
-[tool.hatch.envs.hatch-static-analysis.scripts]
-format-check = "ruff format --check {args:.}"
-format-fix = "ruff format {args:.}"
-lint-check = "ruff check {args:.}"
-lint-fix = "ruff check --fix {args:.}"
-
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
+ignore = [
+  "RUF012",
+]
 
 [tool.ruff.format]
 quote-style = "single"
@@ -63,3 +61,9 @@ inline-quotes = "single"
 multiline-quotes = "double"
 docstring-quotes = "double"
 avoid-escape = false
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "off"
+pythonVersion = "3.11"

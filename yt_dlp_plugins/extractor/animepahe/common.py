@@ -1,28 +1,34 @@
 import itertools
 import re
 from collections.abc import Iterator
-from secrets import token_hex
+from typing import Any
+
 from yt_dlp.extractor.common import InfoExtractor
 from yt_dlp.utils import (
     ExtractorError,
     ISO639Utils,
     decode_packed_codes,
+    get_element_by_class,
     parse_duration,
     str_to_int,
-    get_element_by_class,
 )
 
 
 class AnimepaheBaseIE(InfoExtractor):
     PAHE_BASE_URL_RE = r'https://animepahe\.(?:com|pw|org)%s'
     _DATA_RE = re.compile(
-        r'data-src="(?P<url>[^"]+)"\s*data-fansub="(?P<fnsub>[^"]+)"\s*data-resolution="(?P<height>[^"]+)"\s*data-audio="(?P<lang>[^"]+)"'
+        r'data-(?:src|url)="(?P<url>[^"]+)"[^>]*?data-fansub="(?P<fnsub>[^"]+)"[^>]*?data-resolution="(?P<height>[^"]+)"[^>]*?data-audio="(?P<lang>[^"]+)"'
     )
+    _HEADERS = {
+        'referer': 'https://animepahe.pw/',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0',
+    }
 
+    """
     def _real_initialize(self) -> None:
-        fake_ddg = token_hex(16)
-        for s in ('com', 'pw', 'org'):
-            self._set_cookie(f'.animepahe.{s}', '__ddg2_', fake_ddg)
+        print(self._get_cookies('https://animepahe.pw/'))
+        self._set_cookie(domain='animepahe.pw', name='cf_clearance', value='aji pisang')
+    """
 
     @staticmethod
     def title(title: str) -> str:
@@ -40,22 +46,23 @@ class AnimepaheBaseIE(InfoExtractor):
 
     @staticmethod
     def _get_thumbnail(page: str) -> str | None:
-        found = False
         for s in ('sequel', 'prequel'):
             src = get_element_by_class(f'{s} hidden-sm-down', page)
-            if src is not None:
-                found = True
-                break
-        if found is False:
-            return None
-        match = re.search(r'data-src="(?P<img>[^"]+)"', src)
-        return match.group('img') if match else None
+            if src:
+                match = re.search(r'data-src="(?P<img>[^"]+)"', src)
+                return match.group('img') if match else None
+        return None
 
-    def _yield_formats(self, content: str) -> Iterator[dict[str, str | int | dict[str, str]]]:
+    def _download_webpage(self, *args: Any, **kwargs: Any) -> str:
+        return super()._download_webpage(*args, **kwargs, headers=self._HEADERS, impersonate=True)
+
+    def _yield_formats(self, content: str) -> Iterator[dict[str, str | int | dict[str, str] | None]]:
         lang_pref = self._configuration_arg(key='lang', default='all')
         skipped_langs = set()
         for data in self._DATA_RE.finditer(content):
+            self.write_debug(f'data from _yield_formats: {data}')
             lang_code = ISO639Utils.long2short(lang := data.group('lang'))
+            self.write_debug(f'lang code: {lang_code}')
             if 'all' not in lang_pref and lang_code not in lang_pref:
                 if lang_code not in skipped_langs:
                     self.write_debug(f'Skipping {lang_code!r}: not in preferred languages {lang_pref!r}')
@@ -76,31 +83,28 @@ class AnimepaheBaseIE(InfoExtractor):
 
     def _get_m3u8_url(self, url: str) -> str | None:
         fatal = not self.get_param('ignore_no_formats_error')
-        if (
+        if not (
             encoded_page := self._download_webpage(
                 url,
                 self._generic_id(url),
                 note='Downloading encoded page',
                 fatal=fatal,
-                headers={'referer': 'https://animepahe.pw/'},
             )
-        ) is False:
+        ):
             return None
         decoded_page = decode_packed_codes(encoded_page)
-        return self._search_regex(
-            r'const\s*source\s*=\\\'(?P<url>[^\\]+)\\', decoded_page, name='m3u8 url', group='url', fatal=fatal
-        )
+        return self._search_regex(r'const\s*source\s*=\\\'([^\\]+)\\', decoded_page, name='m3u8 url', fatal=fatal)
 
     def _yield_entries(
-        self, playlist_url: str, playlist_id: str, playlist_title: str, ie: str | object
-    ) -> Iterator[dict[str, str | int | float]]:
+        self, playlist_url: str, playlist_id: str, playlist_title: str
+    ) -> Iterator[dict[str, str | None | float]]:
         base_url = playlist_url.replace('/anime/', '/play/')
         for anime in self._fetch_page_entries(playlist_url, playlist_id):
             episode_num = str_to_int(anime.get('episode'))
             yield self.url_result(
                 url_transparent=True,
                 url=f'{base_url}/{anime.get("session")}',
-                ie=ie,
+                ie='Animepahe',
                 video_id=anime.get('id'),
                 video_title=f'{playlist_title} Episode {episode_num}',
                 episode_number=episode_num,
@@ -115,8 +119,10 @@ class AnimepaheBaseIE(InfoExtractor):
             result = self._download_json(
                 url_or_request='https://animepahe.pw/api',
                 video_id=playlist_id,
-                query={'m': 'release', 'id': playlist_id, 'sort': 'episode_asc', 'page': page_num},
+                query={'m': 'release', 'id': playlist_id, 'sort': 'episode_asc', 'page': str(page_num)},
                 note=f'Downloading page {page_num}',
+                headers=self._HEADERS,
+                impersonate=True,
             )
 
             yield from self._yield_json(result)

@@ -1,14 +1,18 @@
-This is a [yt-dlp](https://github.com/yt-dlp/yt-dlp "yt-dlp repooository") extractor plugin for [animepahe](https://animepahe.pw/ "animepahe"). It supports downloading single episodes, full playlists, and searching for content directly.
+This is a [yt-dlp](https://github.com/yt-dlp/yt-dlp "yt-dlp repooository") extractor plugin for [animepahe](https://animepahe.pw/ "animepahe"). it supports downloading single episodes, full playlists, and searching for content directly.
+
+---
+
+> [!IMPORTANT]
+> **Requirements**: Animepahe requires Cloudflare bypass. 
+> You **must** pass [`--impersonate`][impersonation] and supply valid cookies (e.g., [`--cookies-from-browser <browser>`][cookie]) for downloads to work.
+
+---
 
 ## Installation
 ```bash
 python -m pip install -U https://github.com/yt-dlp-plugins/yt-dlp-animepahe/archive/main.zip
 ```
-## AUR
-> Use the AUR helper you have, for example paru, yay, or whatever.
-```bash
-yay -S yt-dlp-animepahe
-```
+
 ## Usage
 
 **1. Using url**:
@@ -24,23 +28,24 @@ yt-dlp --extractor-args 'animepahe:lang=ja,en' 'https://animepahe.pw/play/1c4439
 ```
 > ⚠️ If the extractor displays `No video formats found!`, it means the language you selected is not available.
 
+
 **2. Using search**:
 ```bash
 yt-dlp 'animepahe:title'
 ```
 ---
 
-# **Questions that might be asked**
-**Q:** Why doesn't it revert to available languages if the language I selected isn't available?
+## Troubleshooting
 
-**A:** If you're using a filter but it's not available, what's the difference between using the filter and not using it? Please fix it yourself if you need the feature.
+- HTTP Error [403](https://github.com/yt-dlp/yt-dlp/wiki/FAQ#im-getting-http-error-403-and-the-site-has-an-open-issue-on-the-tracker-thats-labeled-cloudflare-related-what-can-i-do) (Forbidden) on webpage download: Make sure to pass your browser cookies using [`--cookies-from-browser <browser_name>`][cookie] or [`--cookies <cookie_file>`][cookie].
+- HTTP Error 403 (Forbidden) on video stream: Ensure [`--impersonate`][impersonation] is active to bypass Cloudflare TLS fingerprints.
+- HTTP Error 429 (Too Many Requests): Animepahe rate-limited your IP. Add `--sleep-requests 5` to delay requests.
 
-## Support the Project ☕
-**If this extractor helps you save time, consider supporting its maintenance**:
+---
 
-<div align="left">
-
-[![Trakteer](https://img.shields.io/badge/Trakteer-F16061?style=for-the-badge&logo=buy-me-a-coffee&logoColor=white)](https://trakteer.id/asep5k) [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/rezaoctavian496) [![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/aspe) 
-
+<div align="center">
+  <img src="https://media.tenor.com/PdqGAzCcin8AAAAj/rtx-on-wuwa.gif" alt="iwak tempe"/>
 </div>
 
+[cookie]: https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp
+[impersonation]: https://github.com/yt-dlp/yt-dlp/blob/master/README.md#impersonation
